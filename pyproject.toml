@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "psmplot"
+version = "0.1.0"
+description = "Annotate and mirror-plot peptide-spectrum matches (PSMs) for manual verification"
+readme = "README.md"
+requires-python = ">=3.8"
+authors = [{ name = "Eric Malekos" }]
+dependencies = [
+    "numpy",
+    "matplotlib",
+    "pyteomics>=4.6",
+    "ms2pip",
+]
+
+[project.scripts]
+plot-psm = "scripts.plot_psm:main"
+render-table = "scripts.render_table:main"
+
+[tool.setuptools]
+packages = ["psmplot"]

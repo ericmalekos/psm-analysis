@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+*.egg-info/
+.ipynb_checkpoints/
+
+# rendered output
+out/
+examples/out/
+*.png
+*.pdf
+# keep the one README example figure
+!docs/example_psm.png
+
+# decompressed mzML cache
+*.mzML
