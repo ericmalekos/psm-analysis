@@ -1,0 +1,9 @@
+# generated evidence-map outputs — regenerate with the scripts
+# (repo-root .gitignore already ignores *.png and *.pdf)
+*.svg
+*.html
+figures/
+*_residue_categories.tsv
+*_color.pml
+*_pymol.pml
+*_ss.tsv
