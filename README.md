@@ -5,7 +5,7 @@ manual PSM verification. Each figure has three panels: a b/y **fragment-coverage
 **annotated observed** MS2, and an **observed-vs-MS2PIP mirror**. Optional rubric **grade
 badge** (excellent / good / caution / low-information). Import package: `psmplot`.
 
-<img src="docs/example_psm.png" alt="example PSM figure" width="37.5%">
+<img src="docs/example_psm.png" alt="example PSM figure" width="56.25%">
 
 
 ## Install
@@ -37,11 +37,5 @@ PSMs identified with **MS-GF+**, rescored with **MS²Rescore v2 / Percolator**; 
 = **q < 0.01 AND PEP < 0.1**. Modifications: fixed Carbamidomethyl-C, variable Oxidation-M
 (inferred from the precursor mass), TMT-6plex where applicable; MS2PIP model chosen per
 acquisition (HCD2019 / CID / TMT / Immuno-HCD).
-
-## Portability
-
-| general — any peptide + spectrum | project-specific (this study) |
-|---|---|
-| `psmplot/` package (`plot`, `annotate`, `prediction`, `grade`, `theme`, `spectra`), `scripts/plot_psm.py`, `scripts/render_table.py` | `psmplot/datasets.py` (dataset → MS2PIP-model map), `scripts/render_flagships.py`, `render_macrophage_flagships.py`, `make_grades_*.py` (hard-code this paper's tables and file paths) |
 
 Restyle everything from `psmplot/theme.py` (one `Theme` dataclass — palette, size, fonts, badge colors).
