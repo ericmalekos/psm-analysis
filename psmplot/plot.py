@@ -10,6 +10,7 @@ layout logic only. ``plot_psm`` is the low-level entry point (spectrum + resolve
 most callers use ``psmplot.render_psm``, which resolves mods and charge for you.
 """
 import os
+import re
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -83,21 +84,30 @@ def plot_psm(spec, pep, mods, z, model, title, out_png, subtitle="", tol=None, t
     ax2 = fig.add_subplot(gs[2])
     matched_idx = {j: ion for j, ion, _, _ in ann["matched"]}
 
-    # ---- header (title + QC line); reclaim the space when either is hidden ----
-    has_title = th.show_title and bool(title)
-    has_qc = th.show_qc
-    if has_title and has_qc:
-        top = 0.925
-        fig.suptitle(title, fontsize=th.title_fontsize, weight=th.title_weight, y=0.988)
-        fig.text(0.5, 0.955, qc, ha="center", va="top", fontsize=th.qc_fontsize, color=th.qc_color)
-    elif has_title:
-        top = 0.945
-        fig.suptitle(title, fontsize=th.title_fontsize, weight=th.title_weight, y=0.985)
-    elif has_qc:
-        top = 0.955
-        fig.text(0.5, 0.978, qc, ha="center", va="top", fontsize=th.qc_fontsize, color=th.qc_color)
-    else:
-        top = 0.975
+    # ---- header: title, the scan line under it, then the QC line (stacked from the top) ----
+    # Callers pass the scan/run inside a trailing "(… scan N)" on the title; lift it onto its own
+    # smaller line directly under the title rather than leaving it in the (now smaller) title.
+    scan_line = ""
+    if title:
+        m = re.search(r"\s*\(([^)]*scan[^)]*)\)\s*$", title, re.I)
+        if m:
+            scan_line, title = m.group(1).strip(), title[:m.start()].rstrip()
+    y, drew = 0.990, False
+    if th.show_title and title:
+        fig.text(0.5, y, title, ha="center", va="top", fontsize=th.title_fontsize,
+                 weight=th.title_weight, linespacing=th.title_linespacing)
+        y -= 0.024
+        drew = True
+    if th.show_title and scan_line:
+        fig.text(0.5, y, scan_line, ha="center", va="top",
+                 fontsize=th.title_sub_fontsize, color=th.title_sub_color)
+        y -= 0.019
+        drew = True
+    if th.show_qc:
+        fig.text(0.5, y, qc, ha="center", va="top", fontsize=th.qc_fontsize, color=th.qc_color)
+        y -= 0.018
+        drew = True
+    top = (y - 0.004) if drew else 0.975
 
     # ---- row 0: fragment-coverage map ----
     _coverage_map(ax_map, pep, mods, ann, th)

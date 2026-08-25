@@ -39,10 +39,12 @@ class Theme:
     frag_label_rotation: float = 90.0
 
     # ---------- header text ----------
-    title_fontsize: float = 11.0
+    title_fontsize: float = 9.0            # smaller than before (was 11)
     title_weight: str = "bold"
     title_linespacing: float = 1.4
-    qc_fontsize: float = 8.5               # the QC summary line under the title
+    title_sub_fontsize: float = 8.0        # the scan line, small, directly under the title
+    title_sub_color: str = "#555555"
+    qc_fontsize: float = 8.0               # the QC summary line under the scan line
     qc_color: str = "#333333"
 
     # ---------- axis limits ----------
