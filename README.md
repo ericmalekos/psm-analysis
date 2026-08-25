@@ -5,7 +5,7 @@ manual PSM verification. Each figure has three panels: a b/y **fragment-coverage
 **annotated observed** MS2, and an **observed-vs-MS2PIP mirror**. Optional rubric **grade
 badge** (excellent / good / caution / low-information). Import package: `psmplot`.
 
-<img src="docs/example_psm.png" alt="example PSM figure" width="25%">
+<img src="docs/example_psm.png" alt="example PSM figure" width="37.5%">
 
 
 ## Install
