@@ -31,6 +31,19 @@ r, grade). Batch from a TSV (columns `peptide charge scan spectra_path [dataset]
 python scripts/render_table.py --table psms.tsv --outdir out
 ```
 
+## TMT / TMTpro data
+
+`--tmt` (TMT 6/10/11-plex, 229.1629 Da) or `--tmt tmtpro` (TMTpro 16/18-plex, 304.2071 Da) puts the label on the
+N-term and every K; in `render_table.py` the optional `tmt` column does the same per row, and `render_psm`,
+`plot_psm` and `grade` take `tmt=` (`True`, `"tmt"` or `"tmtpro"`). For a labelled peptide the ions that carry no
+sequence information are removed from the spectrum before annotation, plotting and grading, as the intact precursor
+is: the reporter ions (126 to 131 for TMT, 126 to 135 for TMTpro), the intact tag ion (230.170 / 305.214) and the
+complement ions (precursor less one reporter ion and CO, at charge z-1; in high-resolution spectra only), each with
+its 13C isotope, and the tag + H2O ion. A peak that is also one of the peptide's b/y ions is kept. Otherwise a
+reporter base peak counts as an unexplained peak in the rubric and drives most TMT spectra to *caution*. The QC line
+notes the removal.
+`python tests/test_tmt.py` checks this.
+
 ## PSM source pipeline
 
 PSMs identified with **MS-GF+**, rescored with **MS²Rescore v2 / Percolator**; high-confidence

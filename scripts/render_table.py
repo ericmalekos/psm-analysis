@@ -2,9 +2,10 @@
 """Batch-render every PSM in a TSV (one figure per row).
 
 The TSV must have (at least) these columns:
-    peptide  charge  scan  spectra_path   [dataset]  [run]  [target]
+    peptide  charge  scan  spectra_path   [dataset]  [run]  [target]  [tmt]
 
 - ``dataset`` (optional) selects the MS2PIP model + TMT via psmplot/datasets.py.
+- ``tmt`` (optional: ``tmt`` or ``tmtpro``) sets the TMT label for that row (overrides ``dataset``).
 - ``target`` (optional) groups figures into subfolders and names them.
 - rows whose ``spectra_path`` is missing/absent on disk are skipped.
 
@@ -52,7 +53,7 @@ def main():
         run = r.get("run", "")
         target = r.get("target", "") or "PSM"
         model = psmplot.model_for(dataset, run) if dataset else "HCD2019"
-        tmt = psmplot.is_tmt(dataset) if dataset else False
+        tmt = (r.get("tmt") or "").strip() or (psmplot.is_tmt(dataset) if dataset else False)
 
         sub = os.path.join(args.outdir, target)
         stem = f"{pep[:24]}_{dataset or 'run'}_scan{r['scan']}".replace("/", "_")

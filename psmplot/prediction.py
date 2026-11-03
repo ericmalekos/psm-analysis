@@ -6,7 +6,7 @@ computed b/y m/z (via the ion labels). This is what fixed negative TMT correlati
 """
 import re
 import numpy as np
-from .constants import CAM, OXM, TMT
+from .constants import CAM, OXM, TMT, TMTPRO
 from .annotate import by_ions
 
 _SP = None
@@ -20,22 +20,27 @@ def _sp():
         _SP = SinglePrediction()
         _SP.mod_info.add_from_ms2pip_modstrings(
             [f"Carbamidomethyl,{CAM},opt,C", f"Oxidation,{OXM},opt,M",
-             f"TMT6plex,{TMT},opt,K", f"TMT6plexNterm,{TMT},opt,N-term"])
+             f"TMT6plex,{TMT},opt,K", f"TMT6plexNterm,{TMT},opt,N-term",
+             f"TMTpro,{TMTPRO},opt,K", f"TMTproNterm,{TMTPRO},opt,N-term"])
     return _SP
 
 
 def ms2pip_modstr(pep, mods):
     """Translate our mods dict into an MS2PIP modification string ('0|Name|i|Name|...')."""
     parts = []
-    if mods.get("N-term"):
-        nm = "TMT6plexNterm" if abs(mods["N-term"] - TMT) < 1 else "TMT6plexNterm"
-        parts.append(f"0|{nm}")
+    nt = mods.get("N-term")
+    if nt and abs(nt - TMTPRO) < 0.5:
+        parts.append("0|TMTproNterm")
+    elif nt and abs(nt - TMT) < 0.5:
+        parts.append("0|TMT6plexNterm")
     for i, a in enumerate(pep):
         d = mods.get(i, 0.0)
         if a == "C" and abs(d - CAM) < 0.5:
             parts.append(f"{i+1}|Carbamidomethyl")
         elif a == "M" and abs((d % TMT) - OXM) < 0.5 or (a == "M" and abs(d - OXM) < 0.5):
             parts.append(f"{i+1}|Oxidation")
+        elif a == "K" and abs(d - TMTPRO) < 0.5:
+            parts.append(f"{i+1}|TMTpro")
         elif a == "K" and abs(d - TMT) < 1:
             parts.append(f"{i+1}|TMT6plex")
     return "|".join(parts) if parts else "-"

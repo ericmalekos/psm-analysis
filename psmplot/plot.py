@@ -15,7 +15,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-from .annotate import annotate, clean, longest_series
+from .annotate import annotate, clean, longest_series, detect_tol, by_ions, tmt_kind, drop_tmt
 from .prediction import predict_ms2pip, mirror_corr
 from .theme import DEFAULT
 
@@ -58,14 +58,25 @@ def _coverage_map(ax, pep, mods, ann, th):
             ax.plot([xb, xb + th.map_flag_len], [top_y, top_y], color=th.y_color, lw=th.map_lw, solid_capstyle="round")
 
 
-def plot_psm(spec, pep, mods, z, model, title, out_png, subtitle="", tol=None, theme=None, badge=None):
+def plot_psm(spec, pep, mods, z, model, title, out_png, subtitle="", tol=None, theme=None, badge=None,
+             tmt=None):
     """Render one PSM to ``out_png`` (+ a .pdf if the theme asks). Returns the annotation dict.
 
     ``badge`` (optional) is a rubric grade string ("excellent"/"good"/"caution"/
     "low_information"); when given, a colored grade badge is drawn in the spectrum panel.
+    ``tmt`` (True, ``"tmt"`` or ``"tmtpro"``) removes the TMT reporter, tag and complement ions
+    from the plotted spectrum, as the intact precursor is removed.
     """
     th = theme or DEFAULT
     spec = clean(spec)                                    # drop the intact precursor
+    kind = tmt_kind(tmt, mods)
+    if kind:                                              # and the TMT reporter, tag and complement ions
+        if tol is None:
+            tol = detect_tol(spec["mz"], by_ions(pep, mods, min(2, max(1, z))))
+        spec = drop_tmt(spec, kind, spec.get("pz") or z, tol[1],
+                        keep_mz=[m for _, _, _, m in by_ions(pep, mods, min(2, max(1, z)))])
+    if not len(spec["mz"]):
+        raise ValueError("no fragment peaks left after removing the precursor" + (" and TMT ions" if kind else ""))
     ann = annotate(spec, pep, mods, maxch=min(2, max(1, z)), tol=tol,
                    min_rel_int=th.annotate_min_rel_int)
     mz, it = spec["mz"], spec["it"]
@@ -75,7 +86,8 @@ def plot_psm(spec, pep, mods, z, model, title, out_png, subtitle="", tol=None, t
     ny = len({ion[1] for _, ion, _, _ in ann["matched"] if ion[0] == "y"})
     tolstr = f"{ann['tol'][1]} Da ({'high' if ann['tol'][1] < 0.1 else 'low'}-res)"
     qc = (f"{nb} b-ions, {ny} y-ions   ·   longest run b{bmax}/y{ymax}   ·   "
-          f"{ann['covfrac'] * 100:.0f}% of fragment TIC annotated   ·   tol {tolstr}")
+          f"{ann['covfrac'] * 100:.0f}% of fragment TIC annotated   ·   tol {tolstr}"
+          + (f"   ·   {'TMTpro' if kind == 'tmtpro' else 'TMT'} ions removed" if kind else ""))
 
     fig = plt.figure(figsize=th.figsize)
     gs = fig.add_gridspec(3, 1, height_ratios=list(th.height_ratios), hspace=th.hspace)

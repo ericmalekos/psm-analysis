@@ -28,7 +28,9 @@ def main():
     ap.add_argument("--dataset", default="", help="dataset id -> MS2PIP model + TMT (datasets.py)")
     ap.add_argument("--model", default="", help="MS2PIP model override (e.g. HCD2019, CID, TMT, Immuno-HCD)")
     ap.add_argument("--run", default="", help="run name (only needed to disambiguate PXD008733)")
-    ap.add_argument("--tmt", action="store_true", help="force TMT labelling (N-term + K)")
+    ap.add_argument("--tmt", nargs="?", const="tmt", default="", choices=["tmt", "tmtpro"],
+                    help="force TMT labelling (N-term + K): --tmt or --tmt tmt for TMT 6/10/11-plex, "
+                         "--tmt tmtpro for TMTpro 16/18-plex; reporter, tag and complement ions are removed")
     ap.add_argument("--title", default=None)
     ap.add_argument("--subtitle", default="")
     ap.add_argument("--minimal", action="store_true",

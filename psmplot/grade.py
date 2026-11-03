@@ -8,12 +8,15 @@ The "explained/benign" ion model (what a manual reviewer treats as legitimately 
 without being a sequence ion) covers b/y/a at charge 1..min(2,z), H2O/NH3 losses, internal
 by/ay ions, immonium ions, and the whole precursor family (charge-reduced + 13C isotopes +
 multi-losses). This is what stops a precursor-loss or co-isolation base peak from being
-mis-read as "unexplained". Ported from PSM_Verification grade_psms_rubric.py; automated
-approximation of a manual procedure that also uses USIs and human judgement.
+mis-read as "unexplained". For TMT/TMTpro-labelled peptides the reporter, intact-tag and
+complement ions carry no sequence information and are removed from the spectrum before
+grading (``annotate.drop_tmt``), as the precursor is. Ported from PSM_Verification
+grade_psms_rubric.py; automated approximation of a manual procedure that also uses USIs and
+human judgement.
 """
 import numpy as np
 from .constants import AA, PROTON, H2O
-from .annotate import clean, detect_tol, by_ions, annotate
+from .annotate import clean, detect_tol, by_ions, annotate, tmt_kind, drop_tmt
 
 CO = 27.994915
 NH3 = 17.026549
@@ -83,12 +86,16 @@ def grade(spec, pep, mods, z, nox, ppm, tmt=False, tol=None):
 
     ``mods``/``nox``/``ppm`` are the resolved peptidoform values (from ``infer_oxidations``)
     — pass the same ones used for plotting so the grade matches the figure. ``tol`` defaults
-    to the empirical per-spectrum tolerance (``detect_tol``).
+    to the empirical per-spectrum tolerance (``detect_tol``). ``tmt`` (True, ``"tmt"`` or
+    ``"tmtpro"``) marks a TMT-labelled peptide: its reporter, tag and complement ions are removed
+    before grading, and the precursor tolerance is 13 ppm.
     """
     cs = clean(spec)
     mc = min(2, max(1, z))
     if tol is None:
         tol = detect_tol(cs["mz"], by_ions(pep, mods, mc))
+    kind = tmt_kind(tmt, mods)
+    cs = drop_tmt(cs, kind, spec.get("pz") or z, tol[1], keep_mz=[m for _, _, _, m in by_ions(pep, mods, mc)])
     ann = annotate(cs, pep, mods, maxch=mc, tol=tol)
     L = len(pep)
     sites = set(range(1, L))
@@ -118,7 +125,7 @@ def grade(spec, pep, mods, z, nox, ppm, tmt=False, tol=None):
     cov_ok = cov >= 0.90                                    # near-complete sequence coverage
     gap_ok = gap <= 1                                       # no big break in the ladder
     series_ok = b2 or ny >= L - 1                           # both termini / a (near-)complete y-series
-    ppm_ok = abs(ppm) <= 12 or (tmt and abs(ppm) <= 13)     # precursor mass accuracy (TMT ~-12 ppm offset)
+    ppm_ok = abs(ppm) <= 12 or (kind is not None and abs(ppm) <= 13)   # precursor mass accuracy (TMT ~-12 ppm offset)
     nox_ok = nox <= 2                                       # not over-modified
     base_ok = base_exp                                      # the base peak is an explained/benign ion
     unexp_ok = max_unexp < 0.5                              # no dominant unexplained peak
@@ -132,7 +139,7 @@ def grade(spec, pep, mods, z, nox, ppm, tmt=False, tol=None):
         grade_ = "excellent"
     else:
         grade_ = "good"
-    return dict(grade=grade_, cov=round(cov, 2), gap=gap, nb=nb, ny=ny, L=L, b2=b2,
+    return dict(grade=grade_, tmt=kind, cov=round(cov, 2), gap=gap, nb=nb, ny=ny, L=L, b2=b2,
                 base_exp=base_exp, max_unexp=round(max_unexp, 2), n_unexp=n_unexp, ppm=round(ppm, 1),
                 nox=nox, tol=tol[1], base_assign=base_assign, base_mz=base_mz,
                 cov_ok=cov_ok, gap_ok=gap_ok, series_ok=series_ok, ppm_ok=ppm_ok, nox_ok=nox_ok,
