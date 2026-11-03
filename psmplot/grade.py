@@ -46,8 +46,8 @@ def explained(pep, mods, z, pmz):
             m = sum(res[i:j])
             for c in (1, 2):
                 out += [((m + c * PROTON) / c, f"int[{i}:{j}]by^{c}"), ((m - CO + c * PROTON) / c, f"int[{i}:{j}]ay^{c}")]
-    for a in set(pep):                                          # immonium
-        out.append((AA[a] - 26.00307, f"imm{a}"))
+    for i, a in enumerate(pep):                                 # immonium: residue (with its mods) - CO + H+
+        out.append((res[i] + (nt if i == 0 else 0.0) - CO + PROTON, f"imm{a}"))
     M = pmz * z - z * PROTON                                    # precursor family
     LOSSES = ((0, ""), (-H2O, "-H2O"), (-NH3, "-NH3"), (-2 * H2O, "-2H2O"),
               (-H2O - NH3, "-H2O-NH3"), (-2 * NH3, "-2NH3"), (-3 * H2O, "-3H2O"))
