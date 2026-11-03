@@ -15,7 +15,7 @@ from .constants import AA, PROTON, H2O, CAM, OXM, TMT, TMTPRO
 from .spectra import load_spectrum
 from .annotate import (base_mods, neutral_mass, infer_oxidations, by_ions,
                        detect_tol, clean, annotate, longest_series, tmt_kind, tmt_ions, drop_tmt)
-from .prediction import predict_ms2pip, mirror_corr, ms2pip_modstr
+from .prediction import predict_ms2pip, predict_ms2pip_batch, proforma, mirror_corr, ms2pip_modstr
 from .plot import plot_psm
 from .theme import Theme, DEFAULT, MINIMAL
 from .datasets import model_for, is_tmt
@@ -26,8 +26,23 @@ __all__ = [
     "base_mods", "infer_oxidations", "annotate", "clean", "by_ions",
     "detect_tol", "longest_series", "predict_ms2pip", "mirror_corr",
     "neutral_mass", "model_for", "is_tmt", "grade", "GRADES",
-    "tmt_kind", "tmt_ions", "drop_tmt",
+    "tmt_kind", "tmt_ions", "drop_tmt", "predict_ms2pip_batch", "proforma", "resolve_psm",
 ]
+
+
+def resolve_psm(peptide, charge, spectrum_path, scan, tmt=False):
+    """Load the scan and resolve the peptidoform as :func:`render_psm` does.
+
+    Returns ``(spec, mods, n_ox, ppm)``: fixed Carbamidomethyl (and the TMT label if ``tmt``), with
+    variable Oxidation-M inferred from the precursor mass. Raises ``ValueError`` if the scan cannot be loaded.
+    """
+    charge = int(charge)
+    spec = load_spectrum(spectrum_path, scan)
+    if spec is None or not len(spec["mz"]):
+        raise ValueError(f"scan {scan} not found (or empty) in {spectrum_path}")
+    mods = base_mods(peptide, tmt=tmt)
+    mods, n_ox, ppm = infer_oxidations(peptide, mods, spec["pmz"], spec["pz"] or charge)
+    return spec, mods, n_ox, ppm
 
 
 def render_psm(peptide, charge, spectrum_path, scan, out_png,
@@ -45,11 +60,7 @@ def render_psm(peptide, charge, spectrum_path, scan, out_png,
     mass error), ``highres`` (bool), ``tol`` and ``ms2pip_r``.
     """
     charge = int(charge)
-    spec = load_spectrum(spectrum_path, scan)
-    if spec is None or not len(spec["mz"]):
-        raise ValueError(f"scan {scan} not found (or empty) in {spectrum_path}")
-    mods = base_mods(peptide, tmt=tmt)
-    mods, n_ox, ppm = infer_oxidations(peptide, mods, spec["pmz"], spec["pz"] or charge)
+    spec, mods, n_ox, ppm = resolve_psm(peptide, charge, spectrum_path, scan, tmt=tmt)
     grade_info = grade(spec, peptide, mods, charge, n_ox, ppm, tmt=tmt) if badge else None
     if title is None:
         title = f"{peptide}   {charge}+   (scan {scan})"

@@ -33,12 +33,35 @@ def main():
     ap.add_argument("--limit", type=int, default=0, help="render at most N rows (0 = all)")
     ap.add_argument("--minimal", action="store_true",
                     help="strip title/subtitle/legend/side-labels; keep ion labels, QC line, axes")
+    ap.add_argument("--processes", type=int, default=1, help="MS2PIP 4 batch prediction processes")
     args = ap.parse_args()
     theme = psmplot.MINIMAL if args.minimal else None
 
     rows = list(csv.DictReader(open(args.table), delimiter="\t"))
     if args.limit:
         rows = rows[:args.limit]
+
+    def params(r):
+        pep = r["peptide"]
+        charge = int(r["charge"]) if str(r.get("charge", "")).strip() else 2
+        dataset = r.get("dataset", "")
+        run = r.get("run", "")
+        model = psmplot.model_for(dataset, run) if dataset else "HCD2019"
+        tmt = (r.get("tmt") or "").strip() or (psmplot.is_tmt(dataset) if dataset else False)
+        return pep, charge, dataset, run, model, tmt
+
+    # MS2PIP 4 loads its model files on every single prediction: predict all rows first, one call per model
+    items = []
+    for r in rows:
+        path = r.get("spectra_path", "")
+        if path and os.path.exists(path):
+            pep, charge, dataset, run, model, tmt = params(r)
+            try:
+                _, mods, _, _ = psmplot.resolve_psm(pep, charge, path, r["scan"], tmt=tmt)
+            except Exception:
+                continue
+            items.append((pep, mods, charge, model))
+    psmplot.predict_ms2pip_batch(items, processes=args.processes)
 
     n_ok = n_skip = 0
     qc_out = []
@@ -47,13 +70,8 @@ def main():
         if not path or not os.path.exists(path):
             n_skip += 1
             continue
-        pep = r["peptide"]
-        charge = int(r["charge"]) if str(r.get("charge", "")).strip() else 2
-        dataset = r.get("dataset", "")
-        run = r.get("run", "")
+        pep, charge, dataset, run, model, tmt = params(r)
         target = r.get("target", "") or "PSM"
-        model = psmplot.model_for(dataset, run) if dataset else "HCD2019"
-        tmt = (r.get("tmt") or "").strip() or (psmplot.is_tmt(dataset) if dataset else False)
 
         sub = os.path.join(args.outdir, target)
         stem = f"{pep[:24]}_{dataset or 'run'}_scan{r['scan']}".replace("/", "_")

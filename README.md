@@ -11,7 +11,9 @@ badge** (excellent / good / caution / low-information). Import package: `psmplot
 ## Install
 
 Python ≥ 3.8 with **numpy, matplotlib, pyteomics, ms2pip** (ms2pip does the fragment-intensity
-prediction). No install needed — the scripts add the repo to `sys.path`; `pip install -e .`
+prediction: MS2PIP 3 when installed, else MS2PIP 4, which gets every modification as a mass shift;
+`render_table.py` predicts all rows in one MS2PIP 4 call per model, `--processes N`;
+`$PSMPLOT_MS2PIP_MODEL_DIR` overrides MS2PIP 4's model directory). No install needed — the scripts add the repo to `sys.path`; `pip install -e .`
 also provides a `plot-psm` command.
 
 ## Generate a figure
