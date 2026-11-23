@@ -1,5 +1,7 @@
 # psm-analysis
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24454422.svg)](https://doi.org/10.5281/zenodo.24454422)
+
 Annotate peptide–spectrum matches (PSMs) and mirror them against MS2PIP predictions, for
 manual PSM verification. Each figure has three panels: a b/y **fragment-coverage map**, the
 **annotated observed** MS2, and an **observed-vs-MS2PIP mirror**. Optional rubric **grade
@@ -57,7 +59,8 @@ Restyle everything from `psmplot/theme.py` (one `Theme` dataclass — palette, s
 
 ## Citation
 
-Cite the archived release on Zenodo (metadata in `CITATION.cff` and `.zenodo.json`).
+Cite the archived release on Zenodo: [doi:10.5281/zenodo.24454422](https://doi.org/10.5281/zenodo.24454422) (all versions; resolves to
+the latest), or [doi:10.5281/zenodo.24454423](https://doi.org/10.5281/zenodo.24454423) for v0.1.0. Metadata in `CITATION.cff`.
 
 ## License
 

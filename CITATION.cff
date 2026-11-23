@@ -5,7 +5,16 @@ type: software
 authors:
   - family-names: Malekos
     given-names: Eric
+    orcid: "https://orcid.org/0000-0003-3084-2930"
 version: 0.1.0
+doi: 10.5281/zenodo.24454422
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.24454422
+    description: All versions (concept DOI)
+  - type: doi
+    value: 10.5281/zenodo.24454423
+    description: Version 0.1.0
 date-released: 2026-11-22
 license: MIT
 repository-code: "https://github.com/ericmalekos/psm-analysis"
