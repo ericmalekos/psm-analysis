@@ -9,12 +9,16 @@ description = "Annotate and mirror-plot peptide-spectrum matches (PSMs) for manu
 readme = "README.md"
 requires-python = ">=3.8"
 authors = [{ name = "Eric Malekos" }]
+license = { text = "MIT" }
 dependencies = [
     "numpy",
     "matplotlib",
     "pyteomics>=4.6",
     "ms2pip",
 ]
+
+[project.urls]
+Repository = "https://github.com/ericmalekos/psm-analysis"
 
 [project.scripts]
 plot-psm = "scripts.plot_psm:main"

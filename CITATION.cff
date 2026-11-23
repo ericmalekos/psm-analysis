@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "psm-analysis: annotated and MS2PIP mirror plots of peptide-spectrum matches for manual verification"
+type: software
+authors:
+  - family-names: Malekos
+    given-names: Eric
+version: 0.1.0
+date-released: 2026-11-22
+license: MIT
+repository-code: "https://github.com/ericmalekos/psm-analysis"
+keywords:
+  - proteomics
+  - mass spectrometry
+  - peptide-spectrum match
+  - spectrum annotation
+  - MS2PIP
+  - proteogenomics
+abstract: >-
+  Annotates peptide-spectrum matches (PSMs) and mirrors them against MS2PIP predictions, for manual
+  PSM verification: a b/y fragment-coverage map, the annotated observed MS2 spectrum, an
+  observed-versus-MS2PIP mirror and an optional rubric grade. Reads MGF and mzML and handles TMT and
+  TMTpro spectra.

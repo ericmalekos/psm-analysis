@@ -54,3 +54,11 @@ PSMs identified with **MS-GF+**, rescored with **MS²Rescore v2 / Percolator**; 
 acquisition (HCD2019 / CID / TMT / Immuno-HCD).
 
 Restyle everything from `psmplot/theme.py` (one `Theme` dataclass — palette, size, fonts, badge colors).
+
+## Citation
+
+Cite the archived release on Zenodo (metadata in `CITATION.cff` and `.zenodo.json`).
+
+## License
+
+MIT; see `LICENSE`.

@@ -1,0 +1,14 @@
+{
+  "title": "psm-analysis: annotated and MS2PIP mirror plots of peptide-spectrum matches for manual verification",
+  "upload_type": "software",
+  "description": "<p>psm-analysis (import package <code>psmplot</code>) annotates peptide-spectrum matches (PSMs) and mirrors them against MS2PIP predictions, for manual PSM verification. Each figure has three panels: a b/y fragment-coverage map, the annotated observed MS2 spectrum, and an observed-versus-MS2PIP mirror, with an optional rubric grade (excellent, good, caution, low-information). It reads MGF and mzML, handles TMT and TMTpro spectra (reporter, tag and complement ions removed before annotation and grading), and predicts spectra with MS2PIP 4, including peptides with mass-shift modifications.</p>",
+  "creators": [
+    {"name": "Malekos, Eric"}
+  ],
+  "license": "mit",
+  "access_right": "open",
+  "keywords": ["proteomics", "mass spectrometry", "peptide-spectrum match", "spectrum annotation", "MS2PIP", "proteogenomics"],
+  "related_identifiers": [
+    {"identifier": "https://github.com/ericmalekos/psm-analysis", "relation": "isSupplementTo", "scheme": "url"}
+  ]
+}
